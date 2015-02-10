@@ -523,7 +523,16 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
         }
       }
       ngModel.$parsers.unshift(parseDate);
-
+      // get rid of the default angularjs text formatter that messes with the view value.
+      for (var i = 0; i < ngModel.$formatters.length; i++) {
+          var now = new Date();
+          var fmtFn = ngModel.$formatters[i];
+          var isDefault = fmtFn(now) === now.toString();
+          if (isDefault) {
+              ngModel.$formatters.splice(i, 1);
+              break;
+          }
+      }
       // Inner change
       scope.dateSelection = function(dt) {
         if (angular.isDefined(dt)) {
